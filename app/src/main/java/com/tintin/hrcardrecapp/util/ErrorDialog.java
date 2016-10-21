@@ -20,7 +20,6 @@ public class ErrorDialog  extends AppCompatActivity {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 // TODO Auto-generated method stub
-                //Toast.makeText(getBaseContext(), "按左邊", Toast.LENGTH_SHORT).show();
             }
         });
         _AlertDialog.show();
@@ -35,7 +34,6 @@ public class ErrorDialog  extends AppCompatActivity {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 // TODO Auto-generated method stub
-                //Toast.makeText(getBaseContext(), "按左邊", Toast.LENGTH_SHORT).show();
             }
         });
         _AlertDialog.show();
@@ -50,7 +48,6 @@ public class ErrorDialog  extends AppCompatActivity {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 // TODO Auto-generated method stub
-                //Toast.makeText(getBaseContext(), "按左邊", Toast.LENGTH_SHORT).show();
             }
         });
         _AlertDialog.show();

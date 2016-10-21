@@ -7,15 +7,14 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.tintin.hrcardrecapp.R;
 import com.tintin.hrcardrecapp.model.HRCardRecForm;
 
-import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -171,9 +170,13 @@ public class QueryActivity extends AppCompatActivity {
             FileOutputStream stream = new FileOutputStream(file, true);
             stream.write(data);
             stream.close();
-            Log.i("saveData", "Data Saved");
+            //Log.i("saveData", "Data Saved");
+            Toast.makeText(this,"儲存檔案成功, 位於"+Environment.DIRECTORY_DOWNLOADS+"/"
+                    + filename+"下"
+                    , Toast.LENGTH_LONG).show();
         } catch (IOException e) {
             Log.e("SAVE DATA", "Could not write file " + e.getMessage());
+            Toast.makeText(this,"儲存檔案失敗", Toast.LENGTH_LONG).show();
         }
     }
 }

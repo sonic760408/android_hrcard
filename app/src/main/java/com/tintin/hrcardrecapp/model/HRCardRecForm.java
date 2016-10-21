@@ -1,10 +1,6 @@
 package com.tintin.hrcardrecapp.model;
 
-import android.os.Parcel;
-import android.os.Parcelable;
-
 import java.io.Serializable;
-import java.util.Date;
 
 /**
  * Created by maxhsieh on 2016/10/12.

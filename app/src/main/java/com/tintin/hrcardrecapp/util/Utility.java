@@ -5,7 +5,6 @@ import java.net.NetworkInterface;
 import java.util.Collections;
 import java.util.List;
 import java.io.*;
-import java.net.*;
 import java.util.regex.Pattern;
 
 /**

@@ -24,4 +24,12 @@
         <item name="colorButtonNormal">#00cccc</item>
     </style>
 
+    <style name="CustomAlertDialog">
+        <item name="android:alertDialogTheme">@style/CustomAlertDialogTheme</item>
+    </style>
+
+    <style name="CustomAlertDialogTheme">
+        <item name="android:textColorAlertDialogListItem">@color/some_colors</item>
+    </style>
+
 </resources>

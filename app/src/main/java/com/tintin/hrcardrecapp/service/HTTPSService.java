@@ -96,7 +96,7 @@ public class HTTPSService {
 class ConnectToWebTask extends AsyncTask<String, String, String> {
     private static final String LOG_ACTIVITY_TAG = "ConnectToWebAsync";
     private static final int HTTP_CONNECT_TIME_OUT = 5000;
-    private static final int HTTP_READ_TIME_OUT = 5000;
+    private static final int HTTP_READ_TIME_OUT = 10000;
 
     HttpsURLConnection con;
 

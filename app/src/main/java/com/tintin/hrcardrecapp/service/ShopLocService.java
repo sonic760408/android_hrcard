@@ -1,21 +1,16 @@
 package com.tintin.hrcardrecapp.service;
 
-import android.content.Context;
 import android.util.Log;
 
 import com.tintin.hrcardrecapp.model.ShopLocForm;
-import com.tintin.hrcardrecapp.util.ErrorDialog;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import static android.content.Context.MODE_PRIVATE;
 
 /**
  * Created by maxhsieh on 2016/10/18.
@@ -27,7 +22,6 @@ public class ShopLocService {
     private List<ShopLocForm> shops = new ArrayList<>();
     private List<String> shop_title = new ArrayList<>();
 
-    private int shop_item_index=0;
 
     private static final String LOG_ACTIVITY_TAG = "ShopLocService";
     private static final String SHOPLOC_URL = "https://www.norbelbaby.com.tw/tintinapp/w/store/json/grid";
@@ -100,7 +94,6 @@ public class ShopLocService {
         try {
             JSONObject obj = new JSONObject(json_str);
             JSONObject sub_obj;
-            //Log.e(LOG_ACTIVITY_TAG, " AAAA: "+ json_str);
             JSONArray jsonarray;
             List<ShopLocForm> shopforms = new ArrayList<>();
 

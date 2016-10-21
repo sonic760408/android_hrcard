@@ -6,32 +6,21 @@ import com.tintin.hrcardrecapp.service.HRCardRecService;
 import com.tintin.hrcardrecapp.service.ShopLocService;
 import com.tintin.hrcardrecapp.util.*;
 
-import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Color;
-import android.graphics.drawable.Drawable;
-import android.os.AsyncTask;
-import android.os.Handler;
 import android.os.Looper;
-import android.os.Message;
 import android.os.SystemClock;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.view.ContextThemeWrapper;
-import android.text.InputType;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
@@ -47,16 +36,11 @@ import org.json.JSONObject;
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.List;
-import java.util.concurrent.Callable;
-
-import static java.lang.Thread.sleep;
 
 
 public class MainActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
@@ -125,14 +109,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         //set ItemSelect listener
         sp_Qtype.setOnItemSelectedListener(this);
         sp_Qlimit.setOnItemSelectedListener(this);
-
-        /*
-        Log.v(LOG_ACTIVITY_TAG, "This is Verbose.");
-        Log.d(LOG_ACTIVITY_TAG, "This is Debug.");
-        Log.i(LOG_ACTIVITY_TAG, "This is Information");
-        Log.w(LOG_ACTIVITY_TAG, "This is Warnning.");
-        Log.e(LOG_ACTIVITY_TAG, "This is Error.");
-        */
     }
 
     public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
@@ -213,7 +189,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         limit = QHRCardLimit;
 
         //ERROR checking
-        //ERROR checking
         if (!fieldChecking(false)) {
             return;
         }
@@ -250,7 +225,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     hrCardRecService.queryHRRec(hrcardrecform_thread);
                     qHRCardRecs = (ArrayList<HRCardRecForm>) hrCardRecService.getHRCardRecForms();
                     if (hrCardRecService.getIsError()) {
-                        Toast.makeText(MAIN_ACTIVITY_CONTEXT,"取得資料失敗 請檢查是否有啟用網路連線", Toast.LENGTH_LONG).show();
+                        Toast.makeText(MAIN_ACTIVITY_CONTEXT,"取得資料失敗 請重新操作", Toast.LENGTH_LONG).show();
                     }
                     else
                     {
@@ -267,22 +242,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
             }
         }).start();
-
-        //async to run query data
-        /*
-        try {
-            qHRCardRecs = new ProgressTask().execute(hrcardrecform).get();
-        } catch (Exception ex) {
-            Log.e(LOG_ACTIVITY_TAG, ex.getMessage());
-        }
-        */
-
-        //qHRCardRecs = (ArrayList<HRCardRecForm>) hrCardRecService.getHRCardRecForms();
-        //switch to query layout
-
     }
 
-    //set shop location , use long click
+    //set shop location , use mulitclick
     public void onShopLabelClick(View view) {
         if (SystemClock.elapsedRealtime() - lastClickTime < (MIN_CLICK_MSEC * 2)) {
             setShopClick_times++;
@@ -356,7 +318,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     }
 
     public void selectShopDialog(String[] shop_items, boolean isInitial) {
-        AlertDialog.Builder adb = new AlertDialog.Builder(this);
+        AlertDialog.Builder adb = new AlertDialog.Builder(this, R.style.CustomAlertDialog);
         final String items[] = shop_items;
         adb.setItems(shop_items, new DialogInterface.OnClickListener() {
 
@@ -369,7 +331,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 } else {
                     //set new shop
                     shoplocform = shoplocservice.getShopByName(items[n]);
-                    Log.d(LOG_ACTIVITY_TAG, " XXX FORM " + shoplocform.toString());
 
                     //saved shop info
                     savedShopInfo();
@@ -559,8 +520,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         //switch activity to insert
         startActivity(intent);
-
-        //MainActivity.this.finish();  //disable, due to MainActivity cannot be finish working
     }
 
     //Switch to query activity

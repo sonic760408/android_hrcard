@@ -1,17 +1,14 @@
 package com.tintin.hrcardrecapp.activity;
 
-import android.annotation.TargetApi;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Looper;
 import android.support.v4.app.FragmentActivity;
 
@@ -29,7 +26,6 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import android.os.Bundle;
-import android.support.v4.content.ContextCompat;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -42,11 +38,7 @@ import com.tintin.hrcardrecapp.model.ShopLocForm;
 import com.tintin.hrcardrecapp.service.HRCardRecService;
 import com.tintin.hrcardrecapp.util.ErrorDialog;
 
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-
-import static java.lang.Thread.sleep;
 
 public class InsertActivity extends FragmentActivity implements OnMapReadyCallback, LocationListener {
 
@@ -150,7 +142,7 @@ public class InsertActivity extends FragmentActivity implements OnMapReadyCallba
     }
 
     public void onSubmitClick(View view) {
-        Toast.makeText(view.getContext(), "送出中...", Toast.LENGTH_LONG).show();
+        Toast.makeText(view.getContext(), "送出中...", Toast.LENGTH_SHORT).show();
         btn_submit.setText("正在送出");
         btn_submit.setEnabled(false);
         final HRCardRecService hrcardrecservice = new HRCardRecService();
@@ -223,7 +215,6 @@ public class InsertActivity extends FragmentActivity implements OnMapReadyCallba
             }
         }).start();
 
-        //new ErrorDialog().ShowErrorDialog(INSERT_ACTIVITY_CONTEXT, LOG_ACTIVITY_TAG, " 測試中");
         btn_submit.setText("打卡");
         btn_submit.setEnabled(true);
     }
