@@ -45,7 +45,7 @@ public class InsertActivity extends FragmentActivity implements OnMapReadyCallba
     private static final String LOG_ACTIVITY_TAG = "InsertActivity";
     private final Context INSERT_ACTIVITY_CONTEXT = this;
     private final float DEFAULT_ZOOM_LEVEL = 18.5f;
-    private final double MAX_ACCEPTABLE_RANGE = 0.000050;
+    private final double MAX_ACCEPTABLE_RANGE = 0.000100;
     private final int SHOW_GPS_TOAST_PERIOD = 300;
 
     private GoogleMap mMap;
@@ -68,7 +68,7 @@ public class InsertActivity extends FragmentActivity implements OnMapReadyCallba
     private ShopLocForm shoplocform;
 
     private int find_times;
-
+    private int not_find_times;
     /**
      * ATTENTION: This was auto-generated to implement the App Indexing API.
      * See https://g.co/AppIndexing/AndroidStudio for more information.
@@ -223,7 +223,7 @@ public class InsertActivity extends FragmentActivity implements OnMapReadyCallba
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
         mMap.getUiSettings().setZoomControlsEnabled(true);
-
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(0,0),DEFAULT_ZOOM_LEVEL));
     }
 
     //enable gps function to check shop location
@@ -259,7 +259,7 @@ public class InsertActivity extends FragmentActivity implements OnMapReadyCallba
         marker_your.showInfoWindow();
 
         //Move camera
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(your_loc, DEFAULT_ZOOM_LEVEL));
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(your_loc));
     }
 
     @Override
@@ -272,8 +272,8 @@ public class InsertActivity extends FragmentActivity implements OnMapReadyCallba
 
         //set your latitude and longitude
         setYourLatLng(location.getLatitude(), location.getLongitude());
-        Log.d("YOUR LOC", Double.toString(your_Latitude) + ", " + Double.toString(your_Longitude));
-        Log.d("SHOP LOC", Double.toString(shop_Latitude) + ", " + Double.toString(shop_Longitude));
+        //Log.d("YOUR LOC", Double.toString(your_Latitude) + ", " + Double.toString(your_Longitude));
+        //Log.d("SHOP LOC", Double.toString(shop_Latitude) + ", " + Double.toString(shop_Longitude));
 
         // Add your location on google map
         // remove old location
@@ -281,15 +281,19 @@ public class InsertActivity extends FragmentActivity implements OnMapReadyCallba
 
         if ((Math.abs(shop_Latitude - your_Latitude) < MAX_ACCEPTABLE_RANGE)
                 && (Math.abs(shop_Longitude - your_Longitude) < MAX_ACCEPTABLE_RANGE)) {
-            Toast.makeText(getBaseContext(), "手機確定位於分店, 可打卡", Toast.LENGTH_LONG).show();
-            btn_submit.setText("打卡");
-            btn_submit.setEnabled(true);
-        } else {
             if (find_times % SHOW_GPS_TOAST_PERIOD == 0) {
-                Toast.makeText(getBaseContext(), "請確認GPS已啟動以及手機確實在分店", Toast.LENGTH_LONG).show();
+                Toast.makeText(getBaseContext(), "手機確定位於分店, 可打卡", Toast.LENGTH_LONG).show();
                 find_times = 0;
             }
             find_times++;
+            btn_submit.setText("打卡");
+            btn_submit.setEnabled(true);
+        } else {
+            if (not_find_times % SHOW_GPS_TOAST_PERIOD == 0) {
+                Toast.makeText(getBaseContext(), "請確認GPS已啟動以及手機確實在分店", Toast.LENGTH_LONG).show();
+                not_find_times = 0;
+            }
+            not_find_times++;
             btn_submit.setText("不可打卡");
             btn_submit.setEnabled(false);
         }

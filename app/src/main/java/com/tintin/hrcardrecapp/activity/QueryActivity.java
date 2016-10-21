@@ -52,7 +52,8 @@ public class QueryActivity extends AppCompatActivity {
     public void initObj()
     {
         txt_qInfo = (TextView) findViewById(R.id.txt_qInfo);
-        String msg = "員編:"+hrcardrecform.getEmpno()+" 查詢自"+hrcardrecform.getReaddt()+"前的打卡記錄";
+        String msg = "員編:"+hrcardrecform.getEmpno()
+                +" 查詢含"+hrcardrecform.getReaddt().replace(" 23:59:59","")+"前的打卡記錄";
 
         txt_qInfo.setText(msg);
         table_query = (TableLayout) findViewById(R.id.table_query);

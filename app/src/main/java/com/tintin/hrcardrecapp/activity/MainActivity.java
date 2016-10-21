@@ -195,7 +195,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         //setting value
         empno = "0000" + et_empno.getText().toString();
-        qdate = txt_Qdate.getText().toString().trim().replace("-", "");
+
+        //set qdate's time as 23:59:59 (sql query date set as 00:00:00)
+        qdate = txt_Qdate.getText().toString().trim().concat(" 23:59:59");
 
         //show ring progress dialog
 
