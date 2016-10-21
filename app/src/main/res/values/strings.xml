@@ -13,10 +13,9 @@
     <string-array name="sp_HRrecQlimitArr">
         <item>10筆</item>
         <item>20筆</item>
+        <item>30筆</item>
         <item>50筆</item>
         <item>100筆</item>
-        <item>500筆</item>
-        <item>1000筆</item>
     </string-array>
 
 </resources>

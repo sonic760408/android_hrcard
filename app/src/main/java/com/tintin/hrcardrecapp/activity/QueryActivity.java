@@ -2,9 +2,11 @@ package com.tintin.hrcardrecapp.activity;
 
 import android.content.Intent;
 import android.graphics.Color;
+import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.Button;
 import android.widget.TableLayout;
 import android.widget.TableRow;
@@ -13,6 +15,11 @@ import android.widget.TextView;
 import com.tintin.hrcardrecapp.R;
 import com.tintin.hrcardrecapp.model.HRCardRecForm;
 
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 
 public class QueryActivity extends AppCompatActivity {
@@ -21,9 +28,10 @@ public class QueryActivity extends AppCompatActivity {
     private HRCardRecForm hrcardrecform;
     private static final String LOG_ACTIVITY_TAG = "QueryActivity";
 
-    private Button btn_toFile;
     private TextView txt_qInfo;
     private TableLayout table_query;
+
+    private final float FONT_SIZE = 16.0f;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,7 +52,6 @@ public class QueryActivity extends AppCompatActivity {
 
     public void initObj()
     {
-        btn_toFile = (Button) findViewById(R.id.btn_toFile);
         txt_qInfo = (TextView) findViewById(R.id.txt_qInfo);
         String msg = "員編:"+hrcardrecform.getEmpno()+" 查詢自"+hrcardrecform.getReaddt()+"前的打卡記錄";
 
@@ -54,46 +61,119 @@ public class QueryActivity extends AppCompatActivity {
 
     public void genQueryRow()
     {
-        TextView row_id;
-        TextView row_cardtype;
-        TextView row_readdt;
-
         TableRow tbrow0 = new TableRow(this);
-        TextView tv0 = new TextView(this);
-        tv0.setText(" Sl.No ");
-        tv0.setTextColor(Color.BLACK);
-        tbrow0.addView(tv0);
-        TextView tv1 = new TextView(this);
-        tv1.setText(" Product ");
-        tv1.setTextColor(Color.BLACK);
-        tbrow0.addView(tv1);
-        TextView tv2 = new TextView(this);
-        tv2.setText(" Unit Price ");
-        tv2.setTextColor(Color.BLACK);
-        tbrow0.addView(tv2);
-        TextView tv3 = new TextView(this);
-        tv3.setText(" Stock Remaining ");
-        tv3.setTextColor(Color.BLACK);
+        TableRow.LayoutParams lp;
+        TextView row_id_lb = new TextView(this);
+        row_id_lb.setText("No.");
+        row_id_lb.setTextColor(Color.BLACK);
+        lp = new TableRow.LayoutParams(0, TableRow.LayoutParams.MATCH_PARENT, 0.1f);
+        row_id_lb.setLayoutParams(lp);
+        row_id_lb.setTextSize(FONT_SIZE);
+        tbrow0.addView(row_id_lb);
+
+        TextView row_cardtype_lb = new TextView(this);
+        row_cardtype_lb.setText(" 打卡日期時間 ");
+        row_cardtype_lb.setTextColor(Color.BLACK);
+        lp = new TableRow.LayoutParams(0, TableRow.LayoutParams.MATCH_PARENT, 0.6f);
+        row_cardtype_lb.setLayoutParams(lp);
+        row_cardtype_lb.setTextSize(FONT_SIZE);
+        tbrow0.addView(row_cardtype_lb);
+
+        TextView row_readdt_lb = new TextView(this);
+        row_readdt_lb.setText(" 類型 ");
+        row_readdt_lb.setTextColor(Color.BLACK);
+        row_readdt_lb.setTextSize(FONT_SIZE);
+        lp = new TableRow.LayoutParams(0, TableRow.LayoutParams.MATCH_PARENT, 0.3f);
+        row_readdt_lb.setLayoutParams(lp);
+        tbrow0.addView(row_readdt_lb);
         table_query.addView(tbrow0);
 
-        /*
-        for (int i = 0; i < qHRCardRecs.size(); i++) {
-            TableRow row = new TableRow(this);
-            TableRow.LayoutParams lParams = new TableRow.LayoutParams(0, 0, 0.5f);
-            row.setLayoutParams(lParams);
-            row_id = new TextView(this);
-            row_id.setText("10");
-            row_id.setWidth(20);
-            row.addView(row_id);
-            table_query.addView(row,i);
+        if(qHRCardRecs == null)
+            return;
+        else {
+            for (int i = 0; i < qHRCardRecs.size(); i++) {
+                tbrow0 = new TableRow(this);
 
-            row.addView(checkBox);
-            row.addView(minusBtn);
-            row.addView(qty);
-            row.addView(addBtn);
-            ll.addView(row,i);
+                TextView row_id = new TextView(this);
+                row_id.setText(Integer.toString(i + 1));
+                row_id.setTextColor(Color.BLACK);
+                lp = new TableRow.LayoutParams(0, TableRow.LayoutParams.MATCH_PARENT, 0.1f);
+                row_id.setLayoutParams(lp);
+                row_id.setTextSize(FONT_SIZE);
+                tbrow0.addView(row_id);
+
+                TextView row_cardtype = new TextView(this);
+                row_cardtype.setText(qHRCardRecs.get(i).getReaddt());
+                row_cardtype.setTextColor(Color.BLACK);
+                lp = new TableRow.LayoutParams(0, TableRow.LayoutParams.MATCH_PARENT, 0.6f);
+                row_cardtype.setLayoutParams(lp);
+                row_cardtype.setTextSize(FONT_SIZE);
+                tbrow0.addView(row_cardtype);
+
+                String cardtype = "";
+
+                if(qHRCardRecs.isEmpty())
+                    return;
+
+                switch (qHRCardRecs.get(i).getCardtype()) {
+                    case "1":
+                        cardtype = "上班";
+                        break;
+                    case "2":
+                        cardtype = "公出";
+                        break;
+                    case "3":
+                        cardtype = "公入";
+                        break;
+                    case "4":
+                        cardtype = "下班";
+                        break;
+
+                }
+
+                TextView row_readdt = new TextView(this);
+                row_readdt.setText(cardtype);
+                row_readdt.setTextColor(Color.BLACK);
+                lp = new TableRow.LayoutParams(0, TableRow.LayoutParams.MATCH_PARENT, 0.3f);
+                row_readdt.setLayoutParams(lp);
+                row_readdt.setTextSize(FONT_SIZE);
+                tbrow0.addView(row_readdt);
+                table_query.addView(tbrow0);
+            }
+        }
+    }
+
+    public void onDwBtnClick(View view)
+    {
+        //write to file
+        String buffer = "";
+
+        for(int i = 0; i < qHRCardRecs.size();i++)
+        {
+            buffer = buffer+"WB"+qHRCardRecs.get(i).getEmpno()+"   "
+                    +qHRCardRecs.get(i).getReaddt().replace("-","").replace(":","").replace(" ","")
+                    +qHRCardRecs.get(i).getCardtype()+"\n";
 
         }
-        */
+        //Log.d(" XXXX ", " BUFFER: "+buffer);
+        byte[] b = buffer.getBytes(StandardCharsets.UTF_8);
+        String filename = hrcardrecform.getEmpno()+"-"+hrcardrecform.getReaddt()+"打卡紀錄.txt";
+
+        saveData(b, filename);
+    }
+
+    private void saveData(byte[] data, String filename){
+
+        //saved file to download folder
+        File path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+        File file = new File(path, filename);
+        try {
+            FileOutputStream stream = new FileOutputStream(file, true);
+            stream.write(data);
+            stream.close();
+            Log.i("saveData", "Data Saved");
+        } catch (IOException e) {
+            Log.e("SAVE DATA", "Could not write file " + e.getMessage());
+        }
     }
 }

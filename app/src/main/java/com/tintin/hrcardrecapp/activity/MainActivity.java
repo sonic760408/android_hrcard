@@ -167,16 +167,13 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     QHRCardLimit = "20";
                     break;
                 case 2:
-                    QHRCardLimit = "50";
+                    QHRCardLimit = "30";
                     break;
                 case 3:
-                    QHRCardLimit = "100";
+                    QHRCardLimit = "50";
                     break;
                 case 4:
-                    QHRCardLimit = "500";
-                    break;
-                case 5:
-                    QHRCardLimit = "1000";
+                    QHRCardLimit = "100";
                     break;
             }
         }
@@ -253,14 +250,13 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     hrCardRecService.queryHRRec(hrcardrecform_thread);
                     qHRCardRecs = (ArrayList<HRCardRecForm>) hrCardRecService.getHRCardRecForms();
                     if (hrCardRecService.getIsError()) {
-                        Toast.makeText(MAIN_ACTIVITY_CONTEXT,"取得資料失敗", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(MAIN_ACTIVITY_CONTEXT,"取得資料失敗 請檢查是否有啟用網路連線", Toast.LENGTH_LONG).show();
                     }
                     else
                     {
-                        //Log.w(LOG_ACTIVITY_TAG, "qHRCardRecs LENGTH:" +qHRCardRecs.size());
+                        switchToQuery(hrcardrecform_thread, qHRCardRecs);
                     }
                     progressDialog.dismiss();
-                    switchToQuery(hrcardrecform_thread, qHRCardRecs);
                     Looper.loop();
                 }
                 catch (Exception ex) {

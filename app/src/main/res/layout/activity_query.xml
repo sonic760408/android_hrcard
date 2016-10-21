@@ -22,7 +22,8 @@
             android:layout_height="wrap_content"
             android:id="@+id/btn_toFile"
             android:layout_alignParentTop="true"
-            android:layout_alignParentEnd="true" />
+            android:layout_alignParentEnd="true"
+            android:onClick="onDwBtnClick" />
 
         <TextView
             android:text=""
@@ -50,41 +51,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:id="@+id/t_qRow_0">
-
-                <TextView
-                    android:id="@+id/txt_lb_no_0"
-                    android:layout_width="0dp"
-                    android:layout_height="fill_parent"
-                    android:background="@drawable/cell_shape"
-                    android:padding="5dp"
-                    android:layout_weight="0.1"
-                    android:text="No"
-                    android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:textColor="@android:color/black"
-                    android:gravity="center_vertical|center_horizontal"></TextView>
-
-                <TextView
-                    android:id="@+id/txt_lb_readdt_0"
-                    android:layout_width="0dp"
-                    android:layout_height="fill_parent"
-                    android:background="@drawable/cell_shape"
-                    android:padding="5dp"
-                    android:layout_weight="0.6"
-                    android:text="打卡日期時間"
-                    android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:textColor="@android:color/black"
-                    android:gravity="center_vertical|center_horizontal"></TextView>
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="fill_parent"
-                    android:background="@drawable/cell_shape"
-                    android:padding="5dp"
-                    android:layout_weight="0.3"
-                    android:text="打卡類別"
-                    android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:textColor="@android:color/black"
-                    android:gravity="center_vertical|center_horizontal"></TextView>
 
             </TableRow>
 
