@@ -1,0 +1,287 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="4dp"
+    android:paddingLeft="4dp"
+    android:paddingRight="4dp"
+    android:paddingTop="4dp"
+    tools:context="com.tintin.hrcardrecapp.activity.MainActivity">
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:descendantFocusability="beforeDescendants"
+        android:focusableInTouchMode="true"
+        android:orientation="vertical">
+
+        <!-- do not focus on textview when startup -->
+        <!-- android:focusableInTouchMode="true" -->
+        <!-- android:descendantFocusability="beforeDescendants" -->
+
+        <TableLayout
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:stretchColumns="*">
+
+            <TableRow
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:layout_weight="0.2"
+                android:gravity="center">
+
+                <TextView
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    android:layout_column="0"
+                    android:layout_span="8"
+                    android:text="現在時間"
+                    android:textAlignment="center"
+                    android:textColor="@android:color/black"
+                    android:textSize="30dp" />
+            </TableRow>
+
+            <TableRow
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:layout_weight="0.2"
+                android:gravity="center">
+
+                <TextClock
+                    android:id="@+id/t_Clock"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    android:layout_column="0"
+                    android:layout_span="8"
+                    android:format12Hour="@null"
+                    android:format24Hour="yyyy-MM-dd HH:mm:ss"
+                    android:gravity="center_horizontal"
+                    android:textColor="@android:color/holo_red_dark"
+                    android:textSize="40dp"
+                    android:textStyle="bold"
+                    android:timeZone="GMT+0800" />
+            </TableRow>
+
+            <TableRow
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:layout_weight="0.2"
+                android:gravity="center">
+
+                <TextView
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    android:layout_column="0"
+                    android:layout_span="5"
+                    android:text="目前所在分店："
+                    android:textColor="@android:color/black"
+                    android:textSize="30dp" />
+
+                <TextView
+                    android:id="@+id/txt_shop"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    android:layout_column="5"
+                    android:layout_span="3"
+                    android:onClick="onShopLabelClick"
+                    android:textAlignment="center"
+                    android:textColor="@android:color/black"
+                    android:textSize="30dp" />
+            </TableRow>
+
+            <TableRow
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:layout_weight="0.2"
+                android:gravity="center">
+
+                <TextView
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    android:layout_column="0"
+                    android:layout_span="4"
+                    android:gravity="center_vertical"
+                    android:text="ID"
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    android:textSize="30dp" />
+
+                <EditText
+                    android:id="@+id/et_idno"
+                    style="@style/Widget.AppCompat.EditText"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    android:layout_column="4"
+                    android:layout_span="4"
+                    android:maxLength="10"
+                    android:textAlignment="textEnd"
+                    android:textSize="24dp" />
+            </TableRow>
+
+            <TableRow
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:layout_weight="0.2"
+                android:gravity="center">
+
+                <TextView
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    android:layout_column="0"
+                    android:layout_span="6"
+                    android:gravity="center_vertical"
+                    android:text="員工編號(0000末四碼)"
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    android:textSize="24dp" />
+
+                <EditText
+                    android:id="@+id/et_empno"
+                    style="@style/Widget.AppCompat.EditText"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    android:layout_column="6"
+                    android:layout_span="2"
+                    android:maxLength="4"
+                    android:textAlignment="textEnd"
+                    android:textSize="24dp" />
+            </TableRow>
+
+            <TableRow
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:layout_weight="0.2"
+                android:gravity="center">
+
+                <Button
+                    android:id="@+id/btn_onDuty"
+                    style="@style/Widget.AppCompat.Button.Colored"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_column="0"
+                    android:layout_span="4"
+                    android:onClick="onInsertHRCardRecClick"
+                    android:state_pressed="true"
+                    android:text="上班" />
+
+                <Button
+                    android:id="@+id/btn_offDuty"
+                    style="@style/Widget.AppCompat.Button.Colored"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_column="4"
+                    android:layout_span="4"
+                    android:onClick="onInsertHRCardRecClick"
+                    android:text="下班" />
+            </TableRow>
+
+            <TableRow
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:layout_weight="0.2"
+                android:gravity="center">
+
+                <Button
+                    android:id="@+id/btn_onBuss"
+                    style="@style/Widget.AppCompat.Button.Colored"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_column="0"
+                    android:layout_span="4"
+                    android:onClick="onInsertHRCardRecClick"
+                    android:text="公出" />
+
+                <Button
+                    android:id="@+id/btn_offBuss"
+                    style="@style/Widget.AppCompat.Button.Colored"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_column="4"
+                    android:layout_span="4"
+                    android:onClick="onInsertHRCardRecClick"
+                    android:text="公入" />
+            </TableRow>
+
+            <TableRow
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:layout_weight="0.2"
+                android:gravity="center">
+
+                <TextView
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    android:layout_column="0"
+                    android:layout_span="4"
+                    android:text="紀錄查詢"
+                    android:textAlignment="center"
+                    android:textColor="@android:color/black"
+                    android:textSize="30dp" />
+
+                <TextView
+                    android:id="@+id/txt_Qdate"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_column="4"
+                    android:layout_span="4"
+                    android:textAlignment="center"
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    android:textSize="30dp" />
+
+            </TableRow>
+
+            <TableRow
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:layout_weight="0.2"
+                android:gravity="center">
+
+                <Spinner
+                    android:id="@+id/sp_Qtype"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_column="0"
+                    android:layout_span="2"
+                    android:entries="@array/sp_HRrecQtypeArr"
+                    android:prompt="@string/sp_hrcardrec_prompt" />
+
+                <Spinner
+                    android:id="@+id/sp_Qlimit"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_column="2"
+                    android:layout_span="2"
+                    android:entries="@array/sp_HRrecQlimitArr"
+                    android:prompt="@string/sp_hrcardrec_prompt" />
+
+                <Button
+                    android:id="@+id/btn_Qdate"
+                    style="@style/QueryHRCardRec"
+                    android:layout_width="60dp"
+                    android:layout_height="45dp"
+                    android:layout_column="4"
+                    android:layout_span="4"
+                    android:text="變更查詢日期" />
+
+            </TableRow>
+
+            <TableRow
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:layout_weight="0.2"
+                android:gravity="center">
+
+                <Button
+                    android:id="@+id/btn_QhrRec"
+                    style="@style/QueryHRCardRec"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_column="0"
+                    android:layout_span="8"
+                    android:onClick="onQueryHRCardRecClick"
+                    android:text="打卡紀錄查詢" />
+
+            </TableRow>
+        </TableLayout>
+    </LinearLayout>
+</ScrollView>

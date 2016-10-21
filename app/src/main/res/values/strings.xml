@@ -1,0 +1,22 @@
+<resources>
+    <string name="app_name">HRCardRec</string>
+    <string name="sp_hrcardrec_prompt">查詢條件</string>
+
+    <string-array name="sp_HRrecQtypeArr">
+        <item>全部</item>
+        <item>上班</item>
+        <item>下班</item>
+        <item>公出</item>
+        <item>公入</item>
+    </string-array>
+
+    <string-array name="sp_HRrecQlimitArr">
+        <item>10筆</item>
+        <item>20筆</item>
+        <item>50筆</item>
+        <item>100筆</item>
+        <item>500筆</item>
+        <item>1000筆</item>
+    </string-array>
+
+</resources>
