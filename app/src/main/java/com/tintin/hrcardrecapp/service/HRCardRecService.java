@@ -1,32 +1,15 @@
 package com.tintin.hrcardrecapp.service;
 
-import android.app.AlertDialog;
-import android.app.ProgressDialog;
 import android.util.Log;
 
 import com.tintin.hrcardrecapp.model.HRCardRecForm;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.security.cert.Certificate;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-
-import com.tintin.hrcardrecapp.service.HTTPSService;
-import com.tintin.hrcardrecapp.util.ErrorDialog;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLPeerUnverifiedException;
 
 /**
  * Created by maxhsieh on 2016/10/12.
