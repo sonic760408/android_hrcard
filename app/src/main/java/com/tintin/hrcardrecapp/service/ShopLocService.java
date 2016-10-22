@@ -18,22 +18,20 @@ import java.util.List;
 
 public class ShopLocService {
 
+    private static final String LOG_ACTIVITY_TAG = "TinTin_shop";
+    private static final String SHOPLOC_URL = "https://www.norbelbaby.com.tw/tintinapp/w/store/json/grid";
     private String curshop_name;
     private List<ShopLocForm> shops = new ArrayList<>();
     private List<String> shop_title = new ArrayList<>();
 
-
-    private static final String LOG_ACTIVITY_TAG = "ShopLocService";
-    private static final String SHOPLOC_URL = "https://www.norbelbaby.com.tw/tintinapp/w/store/json/grid";
+    public String getCurShop_name()
+    {
+        return this.curshop_name;
+    }
 
     public void setCurShop_name(String name)
     {
         this.curshop_name = name;
-    }
-
-    public String getCurShop_name()
-    {
-        return this.curshop_name;
     }
 
     public List<ShopLocForm> getShops()
