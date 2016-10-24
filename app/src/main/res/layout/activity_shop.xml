@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_shop"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="4dp"
+    android:paddingLeft="4dp"
+    android:paddingRight="4dp"
+    android:paddingTop="4dp"
+    tools:context="com.tintin.hrcardrecapp.activity.ShopActivity">
+
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/txt_lb_shopset"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:text="請開啟GPS, 進行分店位置校正"
+            android:textAlignment="center"
+            android:textColor="@android:color/black"
+            android:textSize="24dp" />
+
+        <Button
+            android:id="@+id/btn_shopset"
+            style="@style/Widget.AppCompat.Button.Colored"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentStart="true"
+            android:layout_below="@+id/gMap"
+            android:enabled="false"
+            android:onClick="onShopSetClick"
+            android:text="不可校正" />
+
+        <fragment
+            android:id="@+id/gMap"
+            class="com.google.android.gms.maps.SupportMapFragment"
+            android:layout_width="400dp"
+            android:layout_height="350dp"
+            android:layout_alignParentStart="true"
+            android:layout_below="@+id/txt_lb_shopset"
+            android:layout_marginTop="32dp"
+            android:layout_toEndOf="@+id/txt_shopinfo" />
+
+        <TextView
+            android:id="@+id/txt_shopinfo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentStart="true"
+            android:layout_below="@+id/txt_lb_shopset"
+            android:text="目前位置: 北高店"
+            android:textAlignment="center"
+            android:textColor="@android:color/black"
+            android:textSize="24dp" />
+
+    </RelativeLayout>
+</ScrollView>

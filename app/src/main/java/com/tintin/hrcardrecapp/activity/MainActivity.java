@@ -1,22 +1,19 @@
 package com.tintin.hrcardrecapp.activity;
 
-import com.tintin.hrcardrecapp.model.HRCardRecForm;
-import com.tintin.hrcardrecapp.model.ShopLocForm;
-import com.tintin.hrcardrecapp.service.HRCardRecService;
-import com.tintin.hrcardrecapp.service.ShopLocService;
-import com.tintin.hrcardrecapp.util.*;
-
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.wifi.ScanResult;
+import android.os.Bundle;
+import android.os.Handler;
 import android.os.Looper;
+import android.os.Message;
 import android.os.SystemClock;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -30,32 +27,38 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.tintin.hrcardrecapp.R;
+import com.tintin.hrcardrecapp.model.HRCardRecForm;
+import com.tintin.hrcardrecapp.model.ShopLocForm;
+import com.tintin.hrcardrecapp.service.HRCardRecService;
+import com.tintin.hrcardrecapp.service.ShopLocService;
+import com.tintin.hrcardrecapp.util.ErrorDialog;
+import com.tintin.hrcardrecapp.util.Utility;
 
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 
 
 public class MainActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
-    private static final String LOG_ACTIVITY_TAG = "MainActivity";
+    private static final String LOG_ACTIVITY_TAG = "TinTin_Main";
     private static final int DATE_DIALOG_ID = 999;
+    //for message
+    private static final int MSG_SETTEXT = 0;
+    private static final long MIN_CLICK_INTERVAL = 1000;
     private final Context MAIN_ACTIVITY_CONTEXT = this;
-    private long lastClickTime = 0;
     private final int MIN_CLICK_MSEC = 1000;
     private final int MIN_CLICK_TIMES = 10;
-
-    private final String PASSWORD_CHANGE_SHOP = "norbel38";
-
+    private final String PASSWORD_CHANGE_SHOP = "norbel74";
     private final Context context = this;
-
+    private long lastClickTime = 0;
+    private long mLastClickTime;
     private Button btn_Qdate;
     private Spinner sp_Qtype;
     private Spinner sp_Qlimit;
@@ -63,7 +66,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private TextView txt_Qdate;
     private TextClock text_Clock;
 
-    private EditText et_idno;
+    //private EditText et_idno;
     private EditText et_empno;
 
     private TextView txt_shop;
@@ -83,6 +86,46 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private ProgressDialog progressDialog;
 
     private ArrayList<HRCardRecForm> qHRCardRecs;
+    private String new_shop_name = "";
+
+    private List<ScanResult> wifi_result_list;
+    //use handler to handle UI changes for UI thread
+    private Handler handler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+
+            if (msg.what == MSG_SETTEXT) {
+                txt_shop.setText(new_shop_name);
+            }
+
+        }
+    };
+    private DatePickerDialog.OnDateSetListener datePickerListener = new DatePickerDialog.OnDateSetListener() {
+
+        // when dialog box is closed, below method will be called.
+        public void onDateSet(DatePicker view, int selectedYear,
+                              int selectedMonth, int selectedDay) {
+            year = selectedYear;
+            month = selectedMonth;
+            day = selectedDay;
+
+            String str_date = "";
+
+            //set date
+            str_date = str_date.concat(Integer.toString(year)).concat("-");
+
+            //set txt_Qdate as current date
+            if (month + 1 < 10)
+                str_date = str_date.concat("0");
+            str_date = str_date.concat(Integer.toString(month + 1)).concat("-");
+
+            if (day < 10)
+                str_date = str_date.concat("0");
+            str_date = str_date.concat(Integer.toString(day));
+
+            txt_Qdate.setText(new StringBuilder(str_date));
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,6 +133,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         setContentView(R.layout.activity_main);
 
         //setup button listeners
+        Log.w(" ONCREATE", "ONCREATE");
         initViewObj();
         initShopInfo();
         addSetDateListenerOnButton();
@@ -99,7 +143,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         btn_Qdate = (Button) findViewById(R.id.btn_Qdate);
         txt_Qdate = (TextView) findViewById(R.id.txt_Qdate);
         text_Clock = (TextClock) findViewById(R.id.t_Clock);
-        et_idno = (EditText) findViewById(R.id.et_idno);
+        //et_idno = (EditText) findViewById(R.id.et_idno);
         et_empno = (EditText) findViewById(R.id.et_empno);
         sp_Qtype = (Spinner) findViewById(R.id.sp_Qtype);
         sp_Qlimit = (Spinner) findViewById(R.id.sp_Qlimit);
@@ -109,6 +153,10 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         //set ItemSelect listener
         sp_Qtype.setOnItemSelectedListener(this);
         sp_Qlimit.setOnItemSelectedListener(this);
+    }
+
+    public void setShopLocForm(ShopLocForm shoplocform) {
+        this.shoplocform = shoplocform;
     }
 
     public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
@@ -164,25 +212,31 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         if (!loadShopInfoInit()) //first time, need to be set shop location
         {
             //set shops
-            shoplocservice.setAllShopAndLoc();
-            String[] shops = shoplocservice.getShopTitleListsArr();
-            if (shops.length == 0) {
-                new ErrorDialog().ShowErrorDialog(MAIN_ACTIVITY_CONTEXT, " 取得分店列表失敗, 請檢查網路");
-                return;
-            } else {
-                //update shop info
-                selectShopDialog(shops, true);
-            }
+            setShopsLocByWeb();
         } else {
             loadShopInfoInit();  //load shop info
         }
     }
 
     public void onQueryHRCardRecClick(final View v) {
+
+        //prevent multiple click
+        long currentClickTime = SystemClock.uptimeMillis();
+        long elapsedTime = currentClickTime - mLastClickTime;
+
+        mLastClickTime = currentClickTime;
+
+        if (elapsedTime <= MIN_CLICK_INTERVAL) {
+            return;
+        }
+
         String cardtype = "";
         String empno = "";
         String limit = "";
         String qdate = "";
+
+        //btn_Qdate.setText("送出中");
+        //btn_Qdate.setEnabled(false);
 
         //set query cardtype and limit
         cardtype = QHRCardType;
@@ -190,11 +244,14 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         //ERROR checking
         if (!fieldChecking(false)) {
+            btn_Qdate.setText("打卡紀錄查詢");
+            btn_Qdate.setEnabled(true);
             return;
         }
 
         //setting value
-        empno = "0000" + et_empno.getText().toString();
+        empno = et_empno.getText().toString();
+
 
         //set qdate's time as 23:59:59 (sql query date set as 00:00:00)
         qdate = txt_Qdate.getText().toString().trim().concat(" 23:59:59");
@@ -227,23 +284,22 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     hrCardRecService.queryHRRec(hrcardrecform_thread);
                     qHRCardRecs = (ArrayList<HRCardRecForm>) hrCardRecService.getHRCardRecForms();
                     if (hrCardRecService.getIsError()) {
-                        Toast.makeText(MAIN_ACTIVITY_CONTEXT,"取得資料失敗 請重新操作", Toast.LENGTH_LONG).show();
-                    }
-                    else
-                    {
+                        Toast.makeText(MAIN_ACTIVITY_CONTEXT, "取得資料失敗 請重新操作", Toast.LENGTH_LONG).show();
+                    } else {
                         switchToQuery(hrcardrecform_thread, qHRCardRecs);
                     }
                     progressDialog.dismiss();
                     Looper.loop();
-                }
-                catch (Exception ex) {
-                    Log.e(LOG_ACTIVITY_TAG,ex.getMessage());
-                }finally{
+                } catch (Exception ex) {
+                    Log.e(LOG_ACTIVITY_TAG, ex.getMessage());
+                } finally {
                     progressDialog.dismiss();
                 }
 
             }
         }).start();
+        //btn_Qdate.setText("打卡紀錄查詢");
+        //btn_Qdate.setEnabled(true);
     }
 
     //set shop location , use mulitclick
@@ -253,7 +309,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             //Toast.makeText(view.getContext(),"Times: "+Integer.toString(setShopClick_times), Toast.LENGTH_SHORT).show();
             if (setShopClick_times >= MIN_CLICK_TIMES) {
                 setShopClick_times = 0;
-                checkPasswordDialog();
+                checkPasswordDialog(view);
                 lastClickTime = SystemClock.elapsedRealtime();
             }
         } else {
@@ -263,7 +319,47 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         }
     }
 
-    public void checkPasswordDialog() {
+    public void setShopsLocByWeb() {
+        progressDialog = new ProgressDialog(this);
+        progressDialog.setTitle("取得分店列表");
+        progressDialog.setMessage("下載中,請稍後 ...");
+        progressDialog.setIndeterminate(false);
+        progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        progressDialog.setCancelable(false);
+        progressDialog.show();
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Looper.prepare();
+                    //go to change dialog
+                    shoplocservice.setAllShopAndLoc();
+
+                    //get shop info
+                    //shoplocservice.getShopListsArr();
+                    //show list of location
+                    String[] shops = shoplocservice.getShopTitleListsArr();
+
+                    if (shops.length == 0) {
+                        new ErrorDialog().ShowErrorDialog(MAIN_ACTIVITY_CONTEXT, " 取得分店列表失敗");
+                        progressDialog.dismiss();
+                    } else {
+                        //update shop info
+                        progressDialog.dismiss();
+                        selectShopDialog(shops);
+                    }
+                    Looper.loop();
+                } catch (Exception ex) {
+                    Log.e(LOG_ACTIVITY_TAG, ex.getMessage());
+                } finally {
+                    progressDialog.dismiss();
+                }
+            }
+        }).start();
+    }
+
+    public void checkPasswordDialog(final View view) {
         LayoutInflater layoutInflater = LayoutInflater.from(context);
         View promptView = layoutInflater.inflate(R.layout.prompts, null);
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
@@ -279,19 +375,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 // get user input and set it to result
                 if (input.getText().toString().equals(PASSWORD_CHANGE_SHOP)) {
                     //go to change dialog
-                    shoplocservice.setAllShopAndLoc();
+                    setShopsLocByWeb();
 
-                    //get shop info
-                    //shoplocservice.getShopListsArr();
-                    //show list of location
-                    String[] shops = shoplocservice.getShopTitleListsArr();
-                    if (shops.length == 0) {
-                        new ErrorDialog().ShowErrorDialog(MAIN_ACTIVITY_CONTEXT, " 取得分店列表失敗");
-                        return;
-                    } else {
-                        //update shop info
-                        selectShopDialog(shops, false);
-                    }
                 } else {
                     String message = "輸入錯誤, 請重新輸入";
                     AlertDialog.Builder builder = new AlertDialog.Builder(context);
@@ -300,7 +385,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     builder.setNegativeButton("確定", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int id) {
-                            checkPasswordDialog();
+                            checkPasswordDialog(view);
                         }
                     });
                     builder.create().show();
@@ -319,14 +404,21 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         alertD.show();
     }
 
-    public void selectShopDialog(String[] shop_items, boolean isInitial) {
+    public void selectShopDialog(String[] shop_items) {
         AlertDialog.Builder adb = new AlertDialog.Builder(this, R.style.CustomAlertDialog);
         final String items[] = shop_items;
         adb.setItems(shop_items, new DialogInterface.OnClickListener() {
 
             @Override
             public void onClick(DialogInterface d, int n) {
-                txt_shop.setText(items[n]);
+                new_shop_name = items[n];
+                //txt_shop.setText(items[n]);
+
+                //push message to handle the labal(Sub Thread cannot be modify the view, only UI thread can)
+                Message msg = new Message();
+                msg.what = MSG_SETTEXT;
+                handler.sendMessage(msg);
+
                 if (shoplocservice.getShopByName(items[n]) == null) {
                     new ErrorDialog().ShowErrorDialog(MAIN_ACTIVITY_CONTEXT, " 設定新分店失敗");
                     return;
@@ -334,11 +426,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     //set new shop
                     shoplocform = shoplocservice.getShopByName(items[n]);
 
-                    //saved shop info
-                    savedShopInfo();
+                    //switch to ShopActivity
+                    switchToShopSet(shoplocform);
 
-                    //if initialize, do load shop info
-                    loadShopInfoInit();
                 }
             }
 
@@ -385,8 +475,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         //check empno is legal
 
         //setting value
-        idno = et_idno.getText().toString();
-        empno = "0000" + et_empno.getText().toString(); //add zero to fill 8 digit
+        idno = "A000000000";
+        empno = et_empno.getText().toString(); //add zero to fill 8 digit
         readdt = text_Clock.getText().toString();
 
         //set ip
@@ -398,8 +488,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         switchToInsert(hrcardrecform);
     }
 
-    private boolean fieldChecking(boolean isInsert) {
+    public boolean fieldChecking(boolean isInsert) {
         if (isInsert) {
+            /*
             if (et_idno.getText().toString().trim().length() == 0) {
                 //show dialog
                 new ErrorDialog().ShowErrorDialog(MAIN_ACTIVITY_CONTEXT, " ID不可為空");
@@ -417,6 +508,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 et_idno.requestFocus();
                 return false;
             }
+            */
         }
 
         if (et_empno.getText().toString().trim().length() == 0) {
@@ -425,21 +517,22 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             et_empno.requestFocus();
             return false;
         }
-        if (et_empno.getText().toString().trim().length() != 4) {
-            //show dialog
-            new ErrorDialog().ShowErrorDialog(MAIN_ACTIVITY_CONTEXT, LOG_ACTIVITY_TAG, " 請輸入完整的員工編號4碼");
-            et_empno.requestFocus();
-            return false;
+        if (et_empno.getText().toString().trim().length() != 8) {
+            //fill zero
+            String tmp = "";
+            for (int i = 0; i < 8 - et_empno.getText().length(); i++) {
+                tmp = tmp + "0";
+            }
+            et_empno.setText(tmp + et_empno.getText().toString());
         }
         if (!Utility.EmpNoChecker(et_empno.getText().toString().trim())) {
-            new ErrorDialog().ShowErrorDialog(MAIN_ACTIVITY_CONTEXT, LOG_ACTIVITY_TAG, " 請輸入員工編號數字4碼");
+            new ErrorDialog().ShowErrorDialog(MAIN_ACTIVITY_CONTEXT, LOG_ACTIVITY_TAG, " 請輸入員工編號數字");
             et_empno.requestFocus();
             return false;
         }
 
         return true;
     }
-
 
     public void addSetDateListenerOnButton() {
 
@@ -484,33 +577,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         return null;
     }
 
-    private DatePickerDialog.OnDateSetListener datePickerListener = new DatePickerDialog.OnDateSetListener() {
-
-        // when dialog box is closed, below method will be called.
-        public void onDateSet(DatePicker view, int selectedYear,
-                              int selectedMonth, int selectedDay) {
-            year = selectedYear;
-            month = selectedMonth;
-            day = selectedDay;
-
-            String str_date = "";
-
-            //set date
-            str_date = str_date.concat(Integer.toString(year)).concat("-");
-
-            //set txt_Qdate as current date
-            if (month + 1 < 10)
-                str_date = str_date.concat("0");
-            str_date = str_date.concat(Integer.toString(month + 1)).concat("-");
-
-            if (day < 10)
-                str_date = str_date.concat("0");
-            str_date = str_date.concat(Integer.toString(day));
-
-            txt_Qdate.setText(new StringBuilder(str_date));
-        }
-    };
-
     //Switch to insert activity
     public void switchToInsert(HRCardRecForm hrcardrecform) {
         Intent intent = new Intent();
@@ -519,6 +585,15 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         //transfer parameter to insert web
         intent.putExtra("HRCardRecform", hrcardrecform);
         intent.putExtra("ShopLocform", this.shoplocform);
+
+        //switch activity to insert
+        startActivity(intent);
+    }
+
+    //Switch to bind activity
+    public void switchToBind() {
+        Intent intent = new Intent();
+        intent.setClass(MainActivity.this, BindwifiActivity.class);
 
         //switch activity to insert
         startActivity(intent);
@@ -538,36 +613,17 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     }
 
-    public void savedShopInfo() {
-        //saved shop info on the phone permanently
-        try {
-            FileOutputStream fileout = openFileOutput("shopinfo.txt", MODE_PRIVATE);
-            OutputStreamWriter outputWriter = new OutputStreamWriter(fileout);
+    //Switch to shopset activity
+    public void switchToShopSet(ShopLocForm shoplocform) {
+        Intent intent = new Intent();
+        intent.setClass(MainActivity.this, ShopActivity.class);
 
-            //build jsonObject
-            JSONObject jsonObj = new JSONObject();
-            jsonObj.put("shop", this.shoplocform.getGrpname());
-            jsonObj.put("id", this.shoplocform.getGrpno());
-            jsonObj.put("lat", this.shoplocform.getGrp_lat());
-            jsonObj.put("lng", this.shoplocform.getGrp_lng());
+        //transfer parameter to insert web
+        intent.putExtra("ShopLocform", shoplocform);
 
-            outputWriter.write(jsonObj.toString());
+        //switch activity to query
+        startActivity(intent);
 
-            //display file saved message
-            new ErrorDialog().ShowSuccessDialog(MAIN_ACTIVITY_CONTEXT, " 儲存新分店資訊成功");
-
-            if (outputWriter != null) {
-                outputWriter.close();
-            }
-
-            if (fileout != null) {
-                fileout.close();
-            }
-
-        } catch (Exception ex) {
-            new ErrorDialog().ShowErrorDialog(MAIN_ACTIVITY_CONTEXT, " 儲存新分店資訊失敗");
-            Log.e(LOG_ACTIVITY_TAG, ex.getMessage());
-        }
     }
 
     public boolean loadShopInfoInit() {
@@ -593,8 +649,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             str = sb.toString();
             //set shop info to ShopLocForm
             JSONObject jsonObj = new JSONObject(str);
-            shoplocform = new ShopLocForm(jsonObj.getString("id"), jsonObj.getString("shop"),
-                    jsonObj.getString("lat"), jsonObj.getString("lng"));
+            setShopLocForm(new ShopLocForm(jsonObj.getString("id"), jsonObj.getString("shop"),
+                    jsonObj.getString("lat"), jsonObj.getString("lng")));
 
             //set shop title
             txt_shop.setText(jsonObj.getString("shop"));
@@ -604,5 +660,11 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             return false;
         }
     }
+
+    public void onWifiScanClick(View view) {
+        switchToBind();
+    }
+
+
 }
 

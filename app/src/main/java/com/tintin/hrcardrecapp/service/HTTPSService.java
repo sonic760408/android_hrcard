@@ -1,16 +1,13 @@
 package com.tintin.hrcardrecapp.service;
 
 import android.os.AsyncTask;
-import android.util.Base64;
 import android.util.Log;
 
 import com.tintin.hrcardrecapp.model.HRCardRecForm;
 
-import org.apache.http.entity.StringEntity;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -18,26 +15,12 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintWriter;
-import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.security.KeyManagementException;
-import java.security.NoSuchAlgorithmException;
 import java.security.cert.Certificate;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ExecutionException;
 
 import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLPeerUnverifiedException;
-
-import com.google.gson.Gson;
-import com.google.gson.stream.JsonReader;
-
-import org.apache.http.util.EntityUtils;
 
 /**
  * Created by maxhsieh on 2016/10/14.
@@ -45,7 +28,7 @@ import org.apache.http.util.EntityUtils;
 
 public class HTTPSService {
 
-    private static final String LOG_ACTIVITY_TAG = "HTTPSService";
+    private static final String LOG_ACTIVITY_TAG = "TinTin_HTTPService";
 
     public String genHRCardFormJSON(HRCardRecForm hrcardrecform, String type) {
         String json_str = "";
@@ -94,8 +77,8 @@ public class HTTPSService {
 }
 
 class ConnectToWebTask extends AsyncTask<String, String, String> {
-    private static final String LOG_ACTIVITY_TAG = "ConnectToWebAsync";
-    private static final int HTTP_CONNECT_TIME_OUT = 5000;
+    private static final String LOG_ACTIVITY_TAG = "TinTin_ConnectToWebTask";
+    private static final int HTTP_CONNECT_TIME_OUT = 10000;
     private static final int HTTP_READ_TIME_OUT = 10000;
 
     HttpsURLConnection con;

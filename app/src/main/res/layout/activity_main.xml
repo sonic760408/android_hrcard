@@ -97,26 +97,6 @@
                 android:layout_weight="0.2"
                 android:gravity="center">
 
-                <TextView
-                    android:layout_width="fill_parent"
-                    android:layout_height="fill_parent"
-                    android:layout_column="0"
-                    android:layout_span="4"
-                    android:gravity="center_vertical"
-                    android:text="ID"
-                    android:textAppearance="?android:attr/textAppearanceLarge"
-                    android:textSize="30dp" />
-
-                <EditText
-                    android:id="@+id/et_idno"
-                    style="@style/Widget.AppCompat.EditText"
-                    android:layout_width="fill_parent"
-                    android:layout_height="fill_parent"
-                    android:layout_column="4"
-                    android:layout_span="4"
-                    android:maxLength="10"
-                    android:textAlignment="textEnd"
-                    android:textSize="24dp" />
             </TableRow>
 
             <TableRow
@@ -129,22 +109,22 @@
                     android:layout_width="fill_parent"
                     android:layout_height="fill_parent"
                     android:layout_column="0"
-                    android:layout_span="6"
+                    android:layout_span="4"
                     android:gravity="center_vertical"
-                    android:text="員工編號(0000末四碼)"
+                    android:text="員工編號(自動補0)"
                     android:textAppearance="?android:attr/textAppearanceLarge"
-                    android:textSize="24dp" />
+                    android:textSize="20dp" />
 
                 <EditText
                     android:id="@+id/et_empno"
                     style="@style/Widget.AppCompat.EditText"
                     android:layout_width="fill_parent"
                     android:layout_height="fill_parent"
-                    android:layout_column="6"
-                    android:layout_span="2"
-                    android:maxLength="4"
+                    android:layout_column="4"
+                    android:layout_span="4"
+                    android:maxLength="8"
                     android:textAlignment="textEnd"
-                    android:textSize="24dp" />
+                    android:textSize="20dp" />
             </TableRow>
 
             <TableRow
@@ -241,27 +221,21 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_column="0"
-                    android:layout_span="2"
+                    android:layout_span="3"
                     android:entries="@array/sp_HRrecQtypeArr"
-                    android:prompt="@string/sp_hrcardrec_prompt" />
+                    android:prompt="@string/sp_hrcardrec_prompt"
+                    android:textAlignment="center" />
 
                 <Spinner
                     android:id="@+id/sp_Qlimit"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_column="2"
-                    android:layout_span="2"
+                    android:layout_column="3"
+                    android:layout_span="3"
                     android:entries="@array/sp_HRrecQlimitArr"
-                    android:prompt="@string/sp_hrcardrec_prompt" />
+                    android:prompt="@string/sp_hrcardrec_prompt"
+                    android:textAlignment="center" />
 
-                <Button
-                    android:id="@+id/btn_Qdate"
-                    style="@style/QueryHRCardRec"
-                    android:layout_width="60dp"
-                    android:layout_height="45dp"
-                    android:layout_column="4"
-                    android:layout_span="4"
-                    android:text="變更查詢日期" />
 
             </TableRow>
 
@@ -272,16 +246,44 @@
                 android:gravity="center">
 
                 <Button
+                    android:id="@+id/btn_Qdate"
+                    style="@style/QueryHRCardRec"
+                    android:layout_width="60dp"
+                    android:layout_height="45dp"
+                    android:layout_column="0"
+                    android:layout_span="4"
+                    android:text="變更查詢日期" />
+
+                <Button
                     android:id="@+id/btn_QhrRec"
                     style="@style/QueryHRCardRec"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_column="0"
-                    android:layout_span="8"
+                    android:layout_column="4"
+                    android:layout_span="4"
                     android:onClick="onQueryHRCardRecClick"
                     android:text="打卡紀錄查詢" />
 
             </TableRow>
+
+            <TableRow
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:layout_weight="0.2"
+                android:gravity="center">
+
+                <Button
+                    android:id="@+id/btn_scanwifi"
+                    style="@style/Widget.AppCompat.Button.Colored"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_column="0"
+                    android:layout_span="4"
+                    android:onClick="onWifiScanClick"
+                    android:text="WifiScan" />
+
+            </TableRow>
+
         </TableLayout>
     </LinearLayout>
 </ScrollView>

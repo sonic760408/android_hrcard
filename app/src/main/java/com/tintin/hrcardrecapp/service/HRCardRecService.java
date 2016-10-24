@@ -4,12 +4,12 @@ import android.util.Log;
 
 import com.tintin.hrcardrecapp.model.HRCardRecForm;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by maxhsieh on 2016/10/12.
@@ -17,18 +17,18 @@ import org.json.JSONObject;
 
 public class HRCardRecService {
 
-    private static final String LOG_ACTIVITY_TAG = "HRCardRecService";
+    private static final String LOG_ACTIVITY_TAG = "TinTin_HRCardService";
     private static final String HRCARDREC_URL = "https://www.norbelbaby.com.tw/HRCardRecWeb_3-1.0/DoJSON";
     private static boolean isError = false;
+    private List<HRCardRecForm> hrcardrecforms;
 
     public boolean getIsError() {
         return isError;
     }
 
     public void setIsError(boolean isError) {
-        this.isError = isError;
+        HRCardRecService.isError = isError;
     }
-    private List<HRCardRecForm> hrcardrecforms;
 
     //insert date from app to web ap
     public void insertHRRec(HRCardRecForm hrcardrecform) {
@@ -63,14 +63,14 @@ public class HRCardRecService {
         setHRCardRecForms(forms);
     }
 
-    public void setHRCardRecForms(List<HRCardRecForm> hrcardrecforms)
-    {
-        this.hrcardrecforms = hrcardrecforms;
-    }
-
     public List<HRCardRecForm> getHRCardRecForms()
     {
         return hrcardrecforms;
+    }
+
+    public void setHRCardRecForms(List<HRCardRecForm> hrcardrecforms)
+    {
+        this.hrcardrecforms = hrcardrecforms;
     }
 
     public String errJSONResponse(String json_str) {

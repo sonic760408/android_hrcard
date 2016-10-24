@@ -1,17 +1,11 @@
 package com.tintin.hrcardrecapp.activity;
 
-import android.app.AlertDialog;
-import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.location.Location;
-import android.location.LocationListener;
 import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Looper;
-import android.os.SystemClock;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.View;
@@ -32,21 +26,20 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.tintin.hrcardrecapp.R;
-import com.tintin.hrcardrecapp.model.HRCardRecForm;
 import com.tintin.hrcardrecapp.model.ShopLocForm;
-import com.tintin.hrcardrecapp.service.HRCardRecService;
 import com.tintin.hrcardrecapp.util.ErrorDialog;
 
-import java.util.List;
+import org.json.JSONObject;
 
-public class InsertActivity extends FragmentActivity implements OnMapReadyCallback, LocationListener {
+import java.io.FileOutputStream;
+import java.io.OutputStreamWriter;
 
-    private static final String LOG_ACTIVITY_TAG = "TinTin_Insert";
+public class ShopActivity extends FragmentActivity implements OnMapReadyCallback, android.location.LocationListener {
+
+    private static final String LOG_ACTIVITY_TAG = "TinTin_ShopSet";
     private static final long MIN_CLICK_INTERVAL = 1000;
     private final Context INSERT_ACTIVITY_CONTEXT = this;
     private final float DEFAULT_ZOOM_LEVEL = 18.5f;
-    private final double MAX_ACCEPTABLE_RANGE = 0.000100;
-    private final int SHOW_GPS_TOAST_PERIOD = 300;
     private long mLastClickTime;
 
     private GoogleMap mMap;
@@ -55,17 +48,17 @@ public class InsertActivity extends FragmentActivity implements OnMapReadyCallba
     private double shop_Latitude = 0; //shop latitude
     private double shop_Longitude = 0; //shop longitude
 
-    private Button btn_submit;
-    private TextView txt_cardinfo;
-
     //GPS location
     private LocationManager locationManager;
 
-    private HRCardRecForm hrcardrecform;
     private ShopLocForm shoplocform;
+
+    private Button btn_shopset;
+    private TextView txt_shopinfo;
 
     private int find_times;
     private int not_find_times;
+
     /**
      * ATTENTION: This was auto-generated to implement the App Indexing API.
      * See https://g.co/AppIndexing/AndroidStudio for more information.
@@ -75,13 +68,11 @@ public class InsertActivity extends FragmentActivity implements OnMapReadyCallba
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_insert);
+        setContentView(R.layout.activity_shop);
 
         //show the form value
         Intent intent = getIntent();
-        hrcardrecform = (HRCardRecForm) intent.getExtras().getSerializable("HRCardRecform");
         shoplocform = (ShopLocForm) intent.getExtras().getSerializable("ShopLocform");
-
 
         //initialize object
         initViewObj();
@@ -93,6 +84,7 @@ public class InsertActivity extends FragmentActivity implements OnMapReadyCallba
         // ATTENTION: This was auto-generated to implement the App Indexing API.
         // See https://g.co/AppIndexing/AndroidStudio for more information.
         client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
+
     }
 
     public void setYourLatLng(double lat, double log) {
@@ -106,27 +98,12 @@ public class InsertActivity extends FragmentActivity implements OnMapReadyCallba
     }
 
     public void initViewObj() {
-        btn_submit = (Button) findViewById(R.id.btn_submit);
-        txt_cardinfo = (TextView) findViewById(R.id.txt_cardinfo);
-        String cardtype = "";
-        switch (hrcardrecform.getCardtype()) {
-            case "1":
-                cardtype = "上班";
-                break;
-            case "2":
-                cardtype = "公出";
-                break;
-            case "3":
-                cardtype = "公入";
-                break;
-            case "4":
-                cardtype = "下班";
-                break;
-        }
+        btn_shopset = (Button) findViewById(R.id.btn_shopset);
+        txt_shopinfo = (TextView) findViewById(R.id.txt_shopinfo);
 
+        String msg = "目前分店:" + shoplocform.getGrpname();
         //set title
-        txt_cardinfo.setText(shoplocform.getGrpno() + " " + shoplocform.getGrpname() + " 員編:" + hrcardrecform.getEmpno()
-                + " " + hrcardrecform.getReaddt() + " " + cardtype + "打卡");
+        txt_shopinfo.setText(msg);
     }
 
     public void initViewMapObj(double lat, double log) {
@@ -138,108 +115,11 @@ public class InsertActivity extends FragmentActivity implements OnMapReadyCallba
 
     }
 
-    public void onSubmitClick(View view) {
-        //Toast.makeText(view.getContext(), "送出中...", Toast.LENGTH_SHORT).show();
-
-        //prevent multiple click
-        long currentClickTime = SystemClock.uptimeMillis();
-        long elapsedTime = currentClickTime - mLastClickTime;
-
-        mLastClickTime = currentClickTime;
-
-        if (elapsedTime <= MIN_CLICK_INTERVAL) {
-            return;
-        }
-
-        /*
-        if(!isViewClicked){
-            isViewClicked = true;
-        } else {
-            return;
-        }
-        */
-
-        //btn_submit.setText("送出中");
-        //btn_submit.setEnabled(false);
-        final HRCardRecService hrcardrecservice = new HRCardRecService();
-
-        final AlertDialog.Builder dialog = new AlertDialog.Builder(this);
-
-        final ProgressDialog ringProgressDialog =
-                ProgressDialog.show(INSERT_ACTIVITY_CONTEXT, "上傳打卡紀錄","上傳中,請稍後 ...", true);
-        ringProgressDialog.setCancelable(false);  //enable ring progress
-
-        //use new thread to trigger the progress dialog
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    String msg = "";
-                    String cardtype = "";
-                    List<HRCardRecForm> form;
-                    DialogInterface.OnClickListener OkClick = new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int which) {
-                            //close ringprogress
-                            ringProgressDialog.dismiss();
-                        }
-                    };
-
-                    Looper.prepare();  //use loop to handle UIdialog, sub thread default has no UI control
-                    hrcardrecservice.insertHRRec(hrcardrecform);
-                    form = hrcardrecservice.getHRCardRecForms();
-                    if (hrcardrecservice.getIsError() == true) {
-                        Log.d("XXXX"," FAILED ");
-                        dialog.setTitle("新增失敗");
-                        msg = form.get(0).getEmpno();
-                        dialog.setMessage(msg);
-                    } else if (form.isEmpty()) {
-                        dialog.setTitle("新增失敗");
-                        Log.d("XXXX"," EMPTY ");
-                        msg = "回傳結果爲空";
-                        dialog.setMessage(msg);
-                    } else {
-                        dialog.setTitle("新增成功");
-                        Log.d("XXXX"," SUCCESS ");
-                        for (int i = 0; i < form.size(); i++) {
-                            switch (form.get(i).getCardtype()) {
-                                case "1":
-                                    cardtype = "上班";
-                                    break;
-                                case "2":
-                                    cardtype = "公出";
-                                    break;
-                                case "3":
-                                    cardtype = "公入";
-                                    break;
-                                case "4":
-                                    cardtype = "下班";
-                                    break;
-                            }
-                            msg = "員編:" + form.get(i).getEmpno() + "\n新增" +
-                                    form.get(i).getReaddt() + cardtype + "\n補打卡紀錄成功";
-                        }
-                    }
-                    dialog.setMessage(msg);
-                    dialog.setNegativeButton("確定", OkClick);
-                    dialog.show();
-                    ringProgressDialog.dismiss();
-                    Looper.loop();
-                } catch (Exception ex) {
-                    Log.e(LOG_ACTIVITY_TAG,ex.getMessage());
-                }finally{
-                    ringProgressDialog.dismiss();
-                }
-            }
-        }).start();
-        //btn_submit.setText("打卡");
-        //btn_submit.setEnabled(true);
-    }
-
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
         mMap.getUiSettings().setZoomControlsEnabled(true);
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(0,0),DEFAULT_ZOOM_LEVEL));
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(0, 0), DEFAULT_ZOOM_LEVEL));
     }
 
     //enable gps function to check shop location
@@ -280,39 +160,22 @@ public class InsertActivity extends FragmentActivity implements OnMapReadyCallba
 
     @Override
     public void onLocationChanged(Location location) {
-        String msg = "新緯度: " + location.getLatitude()
-                + "新經度: " + location.getLongitude();
+        String msg = "目前緯度: " + location.getLatitude()
+                + "目前經度: " + location.getLongitude();
 
         //for debug
         //Toast.makeText(getBaseContext(), msg, Toast.LENGTH_LONG).show();
 
         //set your latitude and longitude
         setYourLatLng(location.getLatitude(), location.getLongitude());
-        //Log.d("YOUR LOC", Double.toString(your_Latitude) + ", " + Double.toString(your_Longitude));
-        //Log.d("SHOP LOC", Double.toString(shop_Latitude) + ", " + Double.toString(shop_Longitude));
+        Log.d(" NEW SHOP LOC", Double.toString(your_Latitude) + ", " + Double.toString(your_Longitude));
+        Log.d(" OLD SHOP LOC", Double.toString(shop_Latitude) + ", " + Double.toString(shop_Longitude));
 
         // Add your location on google map
         // remove old location
+        btn_shopset.setText("校準");
+        btn_shopset.setEnabled(true);
         refreshMapMarker();
-
-        if ((Math.abs(shop_Latitude - your_Latitude) < MAX_ACCEPTABLE_RANGE)
-                && (Math.abs(shop_Longitude - your_Longitude) < MAX_ACCEPTABLE_RANGE)) {
-            if (find_times % SHOW_GPS_TOAST_PERIOD == 0) {
-                Toast.makeText(getBaseContext(), "手機確定位於分店, 可打卡", Toast.LENGTH_LONG).show();
-                find_times = 0;
-            }
-            find_times++;
-            btn_submit.setText("打卡");
-            btn_submit.setEnabled(true);
-        } else {
-            if (not_find_times % SHOW_GPS_TOAST_PERIOD == 0) {
-                Toast.makeText(getBaseContext(), "請確認GPS已啟動以及手機確實在分店", Toast.LENGTH_LONG).show();
-                not_find_times = 0;
-            }
-            not_find_times++;
-            btn_submit.setText("不可打卡");
-            btn_submit.setEnabled(false);
-        }
 
     }
 
@@ -326,14 +189,15 @@ public class InsertActivity extends FragmentActivity implements OnMapReadyCallba
         Toast.makeText(getBaseContext(), "啟用GPS", Toast.LENGTH_LONG).show();
 
         //get current location
-
+        btn_shopset.setText("校準");
+        btn_shopset.setEnabled(true);
     }
 
     @Override
     public void onProviderDisabled(String provider) {
         Toast.makeText(getBaseContext(), "GPS已停用, 請啟用GPS", Toast.LENGTH_LONG).show();
-        btn_submit.setText("不可打卡");
-        btn_submit.setEnabled(false);
+        btn_shopset.setText("不可校準");
+        btn_shopset.setEnabled(false);
     }
 
     /**
@@ -370,5 +234,64 @@ public class InsertActivity extends FragmentActivity implements OnMapReadyCallba
         // See https://g.co/AppIndexing/AndroidStudio for more information.
         AppIndex.AppIndexApi.end(client, getIndexApiAction());
         client.disconnect();
+    }
+
+    public void onShopSetClick(View view) {
+        //saved shop info
+        ShopLocForm new_shoplocform = this.shoplocform;
+        Double new_shoploclat = this.your_Latitude;
+        Double new_shoploclng = this.your_Longitude;
+        new_shoplocform.setGrp_lat(Double.toString(new_shoploclat));
+        new_shoplocform.setGrp_lng(Double.toString(new_shoploclng));
+
+        //save info
+        savedShopInfo(new_shoplocform);
+
+        //if initialize, do load shop info
+        switchToMain();
+        //switch to MainActivity
+    }
+
+    //Switch to query activity
+    public void switchToMain() {
+        Intent intent = new Intent();
+        intent.setClass(this, MainActivity.class);
+
+        //transfer parameter to insert web
+
+        //close this activity
+        finish();
+    }
+
+    public void savedShopInfo(ShopLocForm shoplocform) {
+        //saved shop info on the phone permanently
+        try {
+            FileOutputStream fileout = openFileOutput("shopinfo.txt", MODE_PRIVATE);
+            OutputStreamWriter outputWriter = new OutputStreamWriter(fileout);
+
+            //build jsonObject
+            JSONObject jsonObj = new JSONObject();
+            jsonObj.put("shop", shoplocform.getGrpname());
+            jsonObj.put("id", shoplocform.getGrpno());
+            jsonObj.put("lat", shoplocform.getGrp_lat());
+            jsonObj.put("lng", shoplocform.getGrp_lng());
+
+            outputWriter.write(jsonObj.toString());
+
+            //display file saved message
+            Toast.makeText(getBaseContext(), "儲存新分店資訊成功", Toast.LENGTH_LONG).show();
+
+            if (outputWriter != null) {
+                outputWriter.close();
+            }
+
+            if (fileout != null) {
+                fileout.close();
+            }
+
+        } catch (Exception ex) {
+            Toast.makeText(getBaseContext(), "儲存新分店資訊失敗, 請聯絡開發人員", Toast.LENGTH_LONG).show();
+            Log.e(LOG_ACTIVITY_TAG, ex.getMessage());
+        }
     }
 }

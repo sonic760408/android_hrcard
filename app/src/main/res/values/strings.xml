@@ -17,5 +17,6 @@
         <item>50筆</item>
         <item>100筆</item>
     </string-array>
+    <string name="title_activity_bindwifi">Bindwifi</string>
 
 </resources>

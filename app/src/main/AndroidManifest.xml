@@ -2,6 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.tintin.hrcardrecapp">
 
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
@@ -27,7 +29,8 @@
             </intent-filter>
         </activity>
         <activity android:name=".activity.InsertActivity" />
-        <activity android:name=".activity.QueryActivity"/>
+        <activity android:name=".activity.QueryActivity" />
+
         <meta-data
             android:name="com.google.android.maps.v2.API_KEY"
             android:value="AIzaSyCwq76Tg64e20qP_EupznVHPCCQDdvxVqo" />
@@ -39,7 +42,8 @@
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
 
-
+        <activity android:name=".activity.ShopActivity" />
+        <activity android:name=".activity.BindwifiActivity"></activity>
     </application>
 
 </manifest>

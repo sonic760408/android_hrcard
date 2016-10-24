@@ -1,10 +1,12 @@
 package com.tintin.hrcardrecapp.util;
 
+import java.io.BufferedInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.FileInputStream;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.util.Collections;
 import java.util.List;
-import java.io.*;
 import java.util.regex.Pattern;
 
 /**
@@ -15,7 +17,7 @@ public class Utility {
 
     public static boolean EmpNoChecker(String empno)
     {
-        final Pattern EMP_PATTERN = Pattern.compile("\\d{4}");
+        final Pattern EMP_PATTERN = Pattern.compile("\\d{8}");
         boolean result = false;
         if (EMP_PATTERN.matcher(empno).matches()) {
             result = true;
@@ -44,7 +46,7 @@ public class Utility {
         if (TWPID_PATTERN.matcher(twpid.toUpperCase()).matches()) {
             int code = pattern.indexOf(twpid.toUpperCase().charAt(0)) + 10;
             int sum = 0;
-            sum = (int) (code / 10) + 9 * (code % 10) + 8 * (twpid.charAt(1) - '0')
+            sum = code / 10 + 9 * (code % 10) + 8 * (twpid.charAt(1) - '0')
                     + 7 * (twpid.charAt(2) - '0') + 6 * (twpid.charAt(3) - '0')
                     + 5 * (twpid.charAt(4) - '0') + 4 * (twpid.charAt(5) - '0')
                     + 3 * (twpid.charAt(6) - '0') + 2 * (twpid.charAt(7) - '0')

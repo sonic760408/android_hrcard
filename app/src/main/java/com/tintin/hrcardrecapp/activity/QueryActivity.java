@@ -2,9 +2,9 @@ package com.tintin.hrcardrecapp.activity;
 
 import android.content.Intent;
 import android.graphics.Color;
+import android.os.Bundle;
 import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.TableLayout;
@@ -23,14 +23,12 @@ import java.util.ArrayList;
 
 public class QueryActivity extends AppCompatActivity {
 
+    private static final String LOG_ACTIVITY_TAG = "TinTin_query";
+    private final float FONT_SIZE = 16.0f;
     private ArrayList<HRCardRecForm> qHRCardRecs;
     private HRCardRecForm hrcardrecform;
-    private static final String LOG_ACTIVITY_TAG = "QueryActivity";
-
     private TextView txt_qInfo;
     private TableLayout table_query;
-
-    private final float FONT_SIZE = 16.0f;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -157,7 +155,7 @@ public class QueryActivity extends AppCompatActivity {
         }
         //Log.d(" XXXX ", " BUFFER: "+buffer);
         byte[] b = buffer.getBytes(StandardCharsets.UTF_8);
-        String filename = hrcardrecform.getEmpno()+"-"+hrcardrecform.getReaddt()+"打卡紀錄.txt";
+        String filename = hrcardrecform.getEmpno() + "-" + hrcardrecform.getReaddt().replace(" 23:59:59", "") + "打卡紀錄.txt";
 
         saveData(b, filename);
     }
